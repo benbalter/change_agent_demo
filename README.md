@@ -12,6 +12,12 @@ require "rss"
 # init a change agent data store in the ./data folder
 change_agent = ChangeAgent.init "data"
 
+# Set up credentials (only required for private repos or pushing)
+change_agent.credentials = Rugged::Credentials::UserPassword.new(
+:username => "x-oauth-basic",
+:password => ENV["GITHUB_TOKEN"]
+)
+
 # fetch the White House blog RSS feed and parse
 url = "http://www.whitehouse.gov/feed/blog/white-house"
 data = open(url).read
@@ -29,4 +35,7 @@ feed.items.each do |post|
   # Save via change agent
   change_agent.set key, value
 end
+
+# push changes to GitHub
+change_agent.push
 ```
